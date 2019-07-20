@@ -1,0 +1,18 @@
+server:
+  port: 1417
+
+spring:
+  resources:
+    static-locations: classpath:/static
+  freemarker:
+    template-loader-path: classpath:/templates #模板保存的路径
+    cache: false # 缓存模板文件，默认是true，生产环境需要打开
+    charset: UTF-8
+    check-template-location: true
+    content-type: text/html # 模板的文本类型
+    expose-request-attributes: false
+    expose-session-attributes: false
+    request-context-attribute: request  # 通过这个变量来使用httpServletRequest
+    suffix: .ftl  #模板的后缀，在跳转向freemarker时，可以不需要写.ftl了
+    settings:
+      number_format: 0  # 取消数字的格式化，默认会被格式化金钱格式，如 1,234
