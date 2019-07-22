@@ -1,4 +1,4 @@
-package com.xiaojiezhu.lefteye.server;
+package com.xiaojiezhu.lefteye.server.test;
 
 import com.xiaojiezhu.lefteye.core.util.ProcessUtils;
 
@@ -15,10 +15,10 @@ import java.util.List;
  */
 public class Demo {
 
-    private static int targetPid = 11408;
+    private static int targetPid = 33445;
 
-    private static String coreJar = "G:\\code\\lefteye\\lefteye-server\\lib\\arthas-core.jar";
-    private static String agentJar = "G:\\code\\lefteye\\lefteye-server\\lib\\arthas-agent.jar";
+    private static String coreJar = "/Users/zxj/data/code/java/lefteye/lefteye-server/lib/arthas-core.jar";
+    private static String agentJar = "/Users/zxj/data/code/java/lefteye/lefteye-server/lib/arthas-agent.jar";
 
     public static void main(String[] args) {
         List<String> attachArgs = new ArrayList<String>();

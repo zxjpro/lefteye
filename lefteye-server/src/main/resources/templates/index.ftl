@@ -109,7 +109,8 @@
             },
 
             clickProcess : function(item){
-                window.open('${path}/process/process/' + item.pid)
+                name = encodeURIComponent(item.name)
+                window.open('${path}/process/process/' + item.pid + "?name=" + name)
             }
 
         },

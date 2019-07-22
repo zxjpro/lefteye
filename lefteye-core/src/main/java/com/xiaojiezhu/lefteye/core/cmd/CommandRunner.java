@@ -4,6 +4,8 @@ package com.xiaojiezhu.lefteye.core.cmd;/**
 
 import com.xiaojiezhu.lefteye.core.exception.CommandException;
 
+import java.io.IOException;
+
 /**
  * @program: lefteye
  * @description: 命令执行
@@ -32,11 +34,36 @@ public interface CommandRunner {
      * 输入回车符
      * @return
      */
-    String enter();
+    String enter() throws CommandException;
 
     /**
      * 建议
      * @return
      */
     String suggest(String cmd) throws CommandException;
+
+    /**
+     * 读取建议，
+     * @param cmd 基本命令
+     * @param timeoutms 超时时间
+     * @return
+     */
+    String suggest(String cmd , int timeoutms) throws CommandException;
+
+    /**
+     * 进入 stream , stream 模式最长可保持5分钟
+     * @param cmd
+     * @param messageListener
+     */
+    void stream(String cmd , MessageListener messageListener) throws CommandException;
+
+    /**
+     * 清除 socket 缓冲区未读取的内容
+     */
+    void clear() throws CommandException;
+
+    /**
+     * 关掉客户端，释放本地资源
+     */
+    void close();
 }

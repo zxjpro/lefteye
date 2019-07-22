@@ -245,7 +245,7 @@ public class ProcessUtils {
             int exitValue = proc.exitValue();
             if (exitValue != 0) {
                 LOG.error("attach fail, targetPid: " + targetPid);
-                System.exit(1);
+                throw new RuntimeException("attach fail, targetPid: " + targetPid);
             }
         } catch (Throwable e) {
             // ignore

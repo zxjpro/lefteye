@@ -3,7 +3,10 @@ package com.xiaojiezhu.lefteye.core.cmd.net;/**
  */
 
 import com.xiaojiezhu.lefteye.core.cmd.CommandRunner;
+import com.xiaojiezhu.lefteye.core.cmd.MessageListener;
 import com.xiaojiezhu.lefteye.core.exception.CommandException;
+import com.xiaojiezhu.lefteye.core.util.IOUtils;
+import com.xiaojiezhu.lefteye.core.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +107,9 @@ public class SocketCommand implements CommandRunner {
                     char c = (char) this.reader.read();
                     sb.append(c);
                 }
+                if(sb.toString().contains("Affect(row-cnt")){
+                    break;
+                }
                 long now = System.currentTimeMillis();
                 if((now - start) > timems){
                     break;
@@ -178,16 +184,28 @@ public class SocketCommand implements CommandRunner {
         } catch (IOException e) {
             throw new CommandException(e);
         }
-        return read();
-    }
-
-    @Override
-    public String enter() {
         return null;
     }
 
     @Override
+    public String enter() throws CommandException {
+        try {
+            this.outputStream.write("\n".getBytes());
+            this.outputStream.flush();
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+
+        return readTimeout(200);
+    }
+
+    @Override
     public String suggest(String cmd) throws CommandException {
+        return suggest(cmd , 600);
+    }
+
+    @Override
+    public String suggest(String cmd, int timeoutms) throws CommandException {
         if(cmd == null){
             cmd = "";
         }
@@ -197,6 +215,64 @@ public class SocketCommand implements CommandRunner {
         } catch (IOException e) {
             throw new CommandException(e);
         }
-        return readTimeout(500);
+        return readTimeout(timeoutms);
+    }
+
+    @Override
+    public void stream(String cmd, MessageListener messageListener) throws CommandException {
+        cmd = "trace com.xiaojiezhu.lefteye.server.test.MathGame run";
+
+        cmd = cmd + " \n";
+        try {
+            this.outputStream.write(cmd.getBytes());
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+
+        new Thread(() -> {
+
+            try {
+
+                int maxStreamTime = 5 * 60 * 1000;
+                long startTime = System.currentTimeMillis();
+
+                while (true){
+                    Thread.sleep(300);
+
+                    StringBuffer sb = new StringBuffer();
+                    while (this.reader.ready()){
+                        char c = (char) this.reader.read();
+                        sb.append(c);
+                    }
+                    messageListener.onMessage(sb.toString());
+
+                    long now = System.currentTimeMillis();
+                    if((now - startTime) > maxStreamTime){
+                        break;
+                    }
+
+                }
+            } catch (Throwable e) {
+                String errInfo = StringUtil.toString(e);
+                LOG.error("stream 读取失败");
+                LOG.error(errInfo);
+                messageListener.onMessage(errInfo);
+
+            }
+
+        }).start();
+
+    }
+
+    @Override
+    public void clear() throws CommandException {
+        readTimeout(100);
+    }
+
+    @Override
+    public void close() {
+        IOUtils.close(this.reader);
+        IOUtils.close(this.outputStream);
+        IOUtils.close(this.socket);
     }
 }
